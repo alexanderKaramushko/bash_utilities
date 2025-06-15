@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+fileName=${1:?"не указан путь до файла"}
+lines=$2
+
+sort -nr $fileName | head -n ${lines:=10}
