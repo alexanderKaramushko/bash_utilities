@@ -4,5 +4,5 @@
 
 ## Установка
 
-`chmod -x install`
-`install`
+1. `chmod -x install` <br />
+2. `install`
