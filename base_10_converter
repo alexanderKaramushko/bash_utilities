@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 base_10_converter () {
   strNumber=$(echo $1 | sed 's/ //g')
   base=$2

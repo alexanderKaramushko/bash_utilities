@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+function make_executable {
+  for file in $(ls $PWD); do
+    if [ -f $file ]; then
+      if [ "$(head -n 1 $file)" = '#!/usr/bin/env bash' ]; then
+        cp $file /usr/local/bin
+        chmod +x /usr/local/bin/$file
+      fi
+    fi
+  done
+}
+
+make_executable

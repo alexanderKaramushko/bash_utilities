@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 catalogs=$1
 subcatalogs_first=$2
 subcatalogs_second=$3

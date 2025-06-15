@@ -27,6 +27,8 @@ create_files () {
     done
 }
 
+#!/usr/bin/env bash
+
 create_catalogs () {
     for (( catalog=1; catalog <= $catalogs; catalog++ ))
     do
