@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+fileName=$1
+lines=$2
+
+sort -nr $fileName | head -n ${lines:-10}
