@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+if [ -N ./file.txt ]; then
+    echo 'file was modified'
+fi
