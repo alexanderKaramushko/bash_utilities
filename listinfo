@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+paths=$(echo $PATH | sed -r s/:/\\n/g)
+
+for path_dir in $(echo $paths -e \\n); do
+  ls -ld $path_dir
+done
