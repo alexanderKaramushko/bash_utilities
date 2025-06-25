@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+tab='\t'
+pipe='|'
+dash='-------'
+
+max_dirs=0
+
+function list_dirs() {
+  tab="$tab\t"
+
+  for dir in "$@"; do
+
+    if [ -f $dir ] && [ $max_dirs -eq 0 ]; then
+      echo -e $pipe$dash$dir
+    fi
+
+    if [ -f $dir ] && [ $max_dirs -ne 0 ]; then
+      echo -e $tab$pipe$dash$dir
+    fi
+
+    if [ -d "$dir" ] && [ $max_dirs -ne 8 ]; then
+      ((max_dirs++))
+
+      dirs=$(command ls $dir)
+
+      cd $dir
+
+      if [ $max_dirs -eq 0 ]; then
+        echo -e $pipe$dash$dir
+      fi
+
+      if [ $max_dirs -ne 0 ]; then
+        echo -e $tab$pipe$dash$dir
+      fi
+
+      list_dirs $dirs
+
+      ((max_dirs--))
+      tab=$(echo $tab | sed 's/\\t$//')
+
+      cd ../
+    fi
+  done
+}
+
+list_dirs $1
