@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+file=$1
+dir=$2
+
+until cp $file $dir; do
+  sleep 5
+done
