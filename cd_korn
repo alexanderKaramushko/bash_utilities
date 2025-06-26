@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+case "$#" in
+  0 | 1)
+    cd "$1"
+    ;;
+  2)
+    new_dir=${PWD/$1/$2}
+
+    if [ -d $new_dir ]; then
+      cd "$new_dir"
+    else
+      echo "Директории не сущестует"
+    fi
+    ;;
+  *)
+    echo "Неправильное кол-во переданных аргументов"
+esac
