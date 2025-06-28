@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+while getopts ":n:l" opt; do
+  case $opt in
+    n)
+      let n=$OPTARG
+
+      target=''
+
+      let count=0
+
+      while [ $count -le $n ]; do
+        target=$(echo "$DIR_STACK" | cut -d ' ' -f $n)
+        (( count++ ))
+      done
+
+      if [ "$target" != "" ]; then
+        echo "На позиции $n находится директория: $target"
+      else
+        echo "Директория на позиции $n не найдена"
+      fi
+
+      ;;
+    l)
+      stack="$DIR_STACK "
+
+      while [[ $stack != "" ]]; do
+        target=$(echo "$stack" | cut -d ' ' -f 1)
+        echo $target
+        stack=${stack#* }
+      done
+      ;;
+    \?)
+      echo 'usage: my_dirs [-l] [-n int] args.'
+      exit 1
+      ;;
+  esac
+done
+
+shift $(($OPTIND - 1))
