@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+dir=$1
+
+DIR_STACK="${DIR_STACK:-$PWD}"
+
+if [ -d "$dir" ]; then
+  DIR_STACK="$PWD/${dir#/} $DIR_STACK"
+  cd $dir
+  echo $DIR_STACK
+else
+  echo "Остаемся в $PWD"
+fi
+
+export DIR_STACK
