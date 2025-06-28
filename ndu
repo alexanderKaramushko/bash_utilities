@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+for dirOrFile in $*; do
+  if [ -e "$dirOrFile" ]; then
+    size=$(du -s $dirOrFile | cut -f 1)
+    # Под один блок в UNIX-системе выделяется минимум 1024 байта
+    let totalBytes=$size*1024
+
+    echo "Выделено под блок $dirOrFile: $totalBytes"
+
+    if [ $totalBytes -ge 1048576 ]; then
+      echo "$(( $totalBytes / 1048576 )) Мб"
+    fi
+
+     if [ $totalBytes -ge 1024 ]; then
+      echo "$(( $totalBytes / 1024 )) Кб"
+    fi
+  fi
+done
