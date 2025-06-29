@@ -1,15 +1,22 @@
 #!/usr/bin/env bash
 
-if [ -z "$DIR_STACK" ]; then
-  echo 'DIR_STACK не найден'
+if [ ${#DIR_STACK[@]} -eq 0 ]; then
+  echo 'DIR_STACK пуст'
 else
-  current_dir=${DIR_STACK%% *}
-  dir=${${DIR_STACK#$current_dir }%% *}
+  let last_index=0
+
+  for element in ${DIR_STACK[@]}; do
+    if [[ -n "$element" && "$element" != " " ]]; then
+      (( last_index++ ))
+    fi
+  done
+
+  dir=${DIR_STACK[(( $last_index-1 ))]}
 
   if [ -d "$dir" ]; then
     cd $dir
-    DIR_STACK=${DIR_STACK#$current_dir }
-    echo $DIR_STACK
+    unset 'DIR_STACK[$last_index]'
+    echo "${DIR_STACK[*]}"
   else
     echo "Остаемся в $PWD"
   fi
