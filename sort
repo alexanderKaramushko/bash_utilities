@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+let index=0
+
+for arg in $(echo -e "$(printf "%s\\n" "$@")" | sort -nk 1); do
+  array[index]=$arg
+  (( index++ ))
+done
+
+echo "${array[*]}"
