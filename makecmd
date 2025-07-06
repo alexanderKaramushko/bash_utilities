@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+makefile=${1:-'./makefile'}
+
+function makecmd {
+  files=$(cat "$makefile" | head -n 1)
+  target=${files%% : *}
+  sources=${files#$target : }
+
+  for source in $sources; do
+    if [[ $source -nt $target ]]; then
+      {
+        while read cmd; do
+          if [[ $cmd != $files ]] && [[ $(grep \t <<< $cmd) ]]; then
+            echo "$cmd"
+            eval "$cmd"
+          fi
+        done
+      } < $makefile
+    fi
+  done
+
+}
+
+makecmd
