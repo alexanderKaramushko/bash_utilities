@@ -1,25 +1,94 @@
 #!/usr/bin/env bash
 
+# Пример makefile:
+
+# ./target.txt : ./source1.txt ./source2.txt
+# 	echo "updated target!" > ./target.txt
+# ./source1.txt : ./source3.txt source4.txt
+# 	echo "updated source1!" > ./source1.txt
+# ./source3.txt : ./source1.txt
+# 	echo "updated source3!" > ./source3.txt
+# ./source4.txt : ./target.txt
+# 	echo "updated source4!" > ./source4.txt
+
+# ------------------------------------------
+
+# Алгоритм парсинга makefile:
+
+# 1. Создать массив посещенных target
+# 2. Взять target
+# 3. Начать идти по sources из target
+# 4. Если source есть в target, то к шагу 2
+# 5. Проверить новее ли текущий source чем target после завершения шагов 1-4
+
 makefile=${1:-'./makefile'}
+content=$(cat $makefile)
+walked=()
 
-function makecmd {
-  files=$(cat "$makefile" | head -n 1)
-  target=${files%% : *}
-  sources=${files#$target : }
+function read_targets() {
+  targets=()
 
-  for source in $sources; do
-    if [[ $source -nt $target ]]; then
-      {
-        while read cmd; do
-          if [[ $cmd != $files ]] && [[ $(grep \t <<< $cmd) ]]; then
-            echo "$cmd"
-            eval "$cmd"
-          fi
-        done
-      } < $makefile
-    fi
-  done
+  {
+    while read; do
+      if [[ ! $(grep '^[[:blank:]]' <<< "$REPLY") ]]; then
+        target=${REPLY%% : *}
+        targets+=("$target")
+      fi
+    done
+  } < $makefile
 
+  echo ${targets[@]}
 }
 
-makecmd
+function get_sources() {
+  target_to_find=$1
+
+   {
+    while read; do
+      target=${REPLY%% : *}
+
+      if [[ "$target" = "$target_to_find" ]]; then
+        echo ${REPLY#$target : }
+      fi
+    done
+  } < $makefile
+}
+
+function makecmd() {
+  if [[ -z "$1" ]]; then
+    echo "Не передан target!"
+    return
+  fi
+
+  target=$1
+
+  walked+=($target)
+
+  sources=$(get_sources $target)
+  targets=$(read_targets)
+
+  for source in $sources; do
+    if [[ $(grep "$source" <<< $targets) ]] && [[ ! $(grep "$source" <<< "${walked[@]}") ]]; then
+      makecmd "$source"
+    fi
+
+    script=$(echo "${content##*$1 : }" | tail -n +2)
+
+    if [[ $source -nt $1 ]]; then
+      {
+        while read; do
+          if [[ $(grep '^[[:blank:]]' <<< "$REPLY") ]]; then
+            echo $1
+            echo "$REPLY"
+            eval "$REPLY" > /dev/null
+          fi
+        done
+      } <<< "$script"
+    fi
+  done
+}
+
+files=$(cat "$makefile" | head -n 1)
+target=${files%% : *}
+
+makecmd $target
