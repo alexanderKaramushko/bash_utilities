@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+file=$1
+shift
+
+dirs=$(echo "$@" | tr ' ' '\n' | command sort -u | tr '\n' ' ')
+
+while [[ "$dirs" != '' ]]; do
+  dir=${dirs%% *}
+  dirs=${dirs##$dir }
+
+  cp "$file" "$dir" &
+done
+
+wait
