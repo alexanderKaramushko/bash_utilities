@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+{
+  while read; do
+    jobNumber=$(echo $REPLY | grep -Eo '\[[0-9]+\]')
+    PID=$(echo $REPLY | grep -Eo '[0-9]+[0-9]+[0-9]+[0-9]+')
+
+    if [[ -n $PID ]]; then
+      raw_cmd=$(ps -o command $PID | tail -n +2)
+      cmd=${raw_cmd##  }
+      raw_time=$(ps -o etime $PID | tail -n +2)
+      time=${raw_time##  }
+
+      echo -e "$jobNumber\t$PID\t$time\t$cmd"
+    fi
+  done
+} <<< $(jobs -l)
