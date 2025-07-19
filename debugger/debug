@@ -51,5 +51,7 @@ done < $original_script
 
 trap 'cleanup "$tmp_dir/$debugger_name"' EXIT
 
+let debug_lines_count=$(wc -l "$lib_dir/debug" | grep -Eo '[0-9]+')
+
 # Точка входа в режим дебаггинга
-trap 'enter_debug $(( $LINENO-56 ))' DEBUG
+trap 'enter_debug $(( $LINENO-1-$debug_lines_count ))' DEBUG
