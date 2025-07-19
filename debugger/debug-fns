@@ -13,6 +13,7 @@
 #   -h, --help отображает это руководство и выходит.
 
 breakpoints=''
+breakpoint_cond=''
 
 function cleanup() {
   echo -e "\nВыходим из DEBUG-режима"
@@ -52,11 +53,35 @@ function set_breakpoint() {
   fi
 }
 
-function has_breakpoint() {
-  echo 'has_breakpoint'
+function set_breakpoint_cond() {
+  if [[ -n "$*" ]]; then
+    breakpoint_cond=$*
+
+    echo "Установлено условие брейкпоинта: $breakpoint_cond"
+  else
+    breakpoint_cond=''
+    echo "Условие брейкпоинта сброшено"
+  fi
 }
 
-function read_cmd() {
+function has_breakpoint() {
+  breakpoint_index=$1
+
+  local i=0
+
+  if [ "$breakpoints" ]; then
+    while [[ $i -lt ${#breakpoints[@]} ]]; do
+      if [[ ${breakpoints[$i] -eq $current_line_number} ]]; then
+        return 0
+      fi
+      ((i+1))
+    done
+  fi
+
+  return 1
+}
+
+function step_in() {
   local cmd args
 
   while read -e -p 'debugger> ' cmd args; do
@@ -67,16 +92,47 @@ function read_cmd() {
       bp)
         set_breakpoint $args
         ;;
+      bc)
+        set_breakpoint_cond $args
+        ;;
+      s)
+        let skip=${args:-1}
+        return
+        ;;
+      go)
+        return
+        ;;
+      -trace)
+        trace=1
+        ;;
+      +trace)
+        trace=0
+        ;;
     esac
   done
 }
 
-function step_into() {
-  local line_number=$1
+function enter_debug() {
+  current_line_number=$1
 
-  read_cmd
+  if [[ $skip -gt 0 ]]; then
+    let skip=$skip-1
+  fi
 
-  # Запустить считывание пользовательского ввода
-  # Для начала добавить bp-комманду, для установки брейкпоинта
-  # для определенной строки
+  if [[ $trace -eq 1 ]]; then
+    echo "$PS4 line $current_line_number: ${lines[$current_line_number]}"
+  fi
+
+  if has_breakpoint; then
+    echo "Найдена точка остановы на строке $current_line_number"
+    step_in
+  elif [[ -n $breakpoint_cond ]]; then
+    eval "$breakpoint_cond"
+    echo "Выполнено условие: $breakpoint_cond"
+    step_in
+  elif [[ $skip -eq 0 ]]; then
+    step_in
+  else
+    echo "Выполнение строки $current_line_number"
+  fi
 }

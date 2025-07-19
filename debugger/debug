@@ -40,6 +40,8 @@ shift 3
 source "$lib_dir/debug-fns"
 
 lines=()
+let skip=1
+trace=1
 
 while read; do
   # Записываем строки оригинального скрипта в массив
@@ -50,4 +52,4 @@ done < $original_script
 trap 'cleanup "$tmp_dir/$debugger_name"' EXIT
 
 # Точка входа в режим дебаггинга
-trap 'step_into $(( $LINENO-46 ))' DEBUG
+trap 'enter_debug $(( $LINENO-56 ))' DEBUG
