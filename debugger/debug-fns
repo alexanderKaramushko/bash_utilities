@@ -12,16 +12,69 @@
 # OPTIONS
 #   -h, --help отображает это руководство и выходит.
 
+breakpoints=''
+
 function cleanup() {
-  echo "Выходим из DEBUG-режима"
+  echo -e "\nВыходим из DEBUG-режима"
   trap - DEBUG
 
   echo "Удаляем $1"
   rm $1
 }
 
+function set_breakpoint() {
+  local breakpoint_index=$1
+
+  for breakpoint in $breakpoints; do
+    if [[ $breakpoint -eq $breakpoint_index ]]; then
+      echo "Уже установлена точка остановы на строке $breakpoint_index"
+      return;
+    fi
+  done
+
+  if [[ -z "$breakpoint_index" ]]; then
+    echo "Индекс $breakpoint_index точки остановы не найден"
+  elif [[ $(echo $breakpoint_index | grep '^[0-9]*') ]]; then
+    if [[ -n ${lines[$breakpoint_index]} ]]; then
+      breakpoints=$(cat <(
+        for breakpoint in "$breakpoints"; do
+          echo $breakpoint_index
+          echo $breakpoint
+        done
+      ) | sort -n)
+
+      echo "Установлена точка остановы на строке $breakpoint_index"
+    else
+      echo "Строка $breakpoint_index пустая"
+    fi
+  else
+    echo "Индекс $breakpoint_index точки остановы не является числовым"
+  fi
+}
+
+function has_breakpoint() {
+  echo 'has_breakpoint'
+}
+
+function read_cmd() {
+  local cmd args
+
+  while read -e -p 'debugger> ' cmd args; do
+    case "$cmd" in
+      \? | h)
+        menu
+        ;;
+      bp)
+        set_breakpoint $args
+        ;;
+    esac
+  done
+}
+
 function step_into() {
-  line_number=$1
+  local line_number=$1
+
+  read_cmd
 
   # Запустить считывание пользовательского ввода
   # Для начала добавить bp-комманду, для установки брейкпоинта

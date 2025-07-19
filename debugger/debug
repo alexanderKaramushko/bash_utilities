@@ -26,21 +26,28 @@
 
 # OPTIONS
 #   -h, --help отображает это руководство и выходит.
+#   bp N установить точку остановы на строку N.
 
 debugger_name=${0##*/}
 original_script=$1
 tmp_dir=$2
 lib_dir=$3
 
+# Удаляем аргументы дебаггера
 shift 3
 
+# Импортируем функции дебаггига
 source "$lib_dir/debug-fns"
 
 lines=()
 
-while read -p "aaaaaa"; do
-  lines+=($REPLY)
+while read; do
+  # Записываем строки оригинального скрипта в массив
+  # Это понадобится для установки точек остановы и логгирования комманд
+  lines+=("$REPLY")
 done < $original_script
 
 trap 'cleanup "$tmp_dir/$debugger_name"' EXIT
+
+# Точка входа в режим дебаггинга
 trap 'step_into $(( $LINENO-46 ))' DEBUG
