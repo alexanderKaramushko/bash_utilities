@@ -18,6 +18,7 @@ breakpoint_cond=''
 function cleanup() {
   echo -e "\nВыходим из DEBUG-режима"
   trap - DEBUG
+  set +o functrace
 
   echo "Удаляем $1"
   rm $1
