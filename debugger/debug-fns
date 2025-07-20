@@ -81,6 +81,25 @@ function has_breakpoint() {
   return 1
 }
 
+function display_text() {
+  local line_number=0
+
+  if [[ ${#lines[@]} -gt 0 ]]; then
+    for line in "${lines[@]}"; do
+      pointer=''
+
+      if [[ $current_line_number -eq $line_number ]]; then
+        pointer='>'
+      fi
+
+      echo "$line_number:$pointer $line"
+      let line_number=$line_number+1
+    done
+  else
+    echo "Не найдены команды для скрипта по пути: $script_path"
+  fi
+}
+
 function step_in() {
   local cmd args
 
@@ -107,6 +126,9 @@ function step_in() {
         ;;
       +trace)
         trace=0
+        ;;
+      dt)
+        display_text
         ;;
     esac
   done
