@@ -25,3 +25,7 @@ driver -> debug + original script <- read cmd
 `script_lines` – массив строк оригинального скрипта <br />
 `steps` – кол-во пропускаемых строк оригинального скрипта <br />
 `breakpoint_lines` – массив точек остановы
+
+## Пример использования
+
+`./debug-driver sort`
