@@ -25,6 +25,16 @@ function cleanup() {
   rm $1
 }
 
+function list_bp() {
+  for breakpoint in $breakpoints; do
+    if [[ -n ${lines[$breakpoint]} ]]; then
+      cmd=$(echo ${lines[$breakpoint]} | sed 's/^\s\+//g')
+      
+      echo "Точка остановы: $breakpoint > ${cmd}"
+    fi
+  done
+}
+
 function set_breakpoint() {
   local breakpoint_index=$1
 
@@ -37,6 +47,7 @@ function set_breakpoint() {
 
   if [[ -z "$breakpoint_index" ]]; then
     echo "Индекс $breakpoint_index точки остановы не найден"
+    list_bp
   elif [[ $(echo $breakpoint_index | grep '^[0-9]*') ]]; then
     if [[ -n ${lines[$breakpoint_index]} ]]; then
       breakpoints=$(cat <(
