@@ -182,6 +182,9 @@ function step_in() {
       dt)
         display_script
         ;;
+      q)
+        exit 0
+        ;;
     esac
   done
 }
