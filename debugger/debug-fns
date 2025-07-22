@@ -47,7 +47,7 @@ function set_breakpoint() {
 
   if [[ -z "$breakpoint_index" ]]; then
     list_bp
-  elif [[ $(echo $breakpoint_index | grep '^[0-9]*') ]]; then
+  elif [[ $(echo $breakpoint_index | grep '^[0-9]$') ]]; then
     if [[ -n ${lines[$breakpoint_index]} ]]; then
       sorted=$(cat <(
         echo $breakpoint_index
@@ -78,7 +78,7 @@ function clear_bp() {
   if [[ -z "$line_number" ]]; then
     breakpoints=()
     echo "Все точки остановы удалены"
-  elif [[ $(echo $line_number | grep '^[0-9]*') ]]; then
+  elif [[ $(echo $line_number | grep '^[0-9]$') ]]; then
     if has_breakpoint $line_number; then
       length=${#breakpoints[@]}
 
@@ -186,7 +186,13 @@ function step_in() {
         set_breakpoint_cond $args
         ;;
       s)
-        let skip=${args:-1}
+        echo $args
+        if [[ $(echo $args | grep '^[0-9]$') ]]; then
+          let skip=${args:-1}
+        else
+          echo 'Передан невалидный аргумент'
+        fi
+
         return
         ;;
       go)
