@@ -21,7 +21,7 @@ function cleanup() {
 
   set +o functrace
 
-  echo "Удаляем $1"
+  echo "Удаляем tmp-файл по пути: $1"
   rm $1
 }
 
