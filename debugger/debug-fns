@@ -26,11 +26,11 @@ function cleanup() {
 }
 
 function list_bp() {
-  for breakpoint in $breakpoints; do
+  for breakpoint in ${breakpoints[@]}; do
     if [[ -n ${lines[$breakpoint]} ]]; then
       cmd=$(echo ${lines[$breakpoint]} | sed 's/^\s\+//g')
       
-      echo "Точка остановы: $breakpoint > ${cmd}"
+      echo "Точка остановы на строке $breakpoint > ${cmd}"
     fi
   done
 }
@@ -46,7 +46,6 @@ function set_breakpoint() {
   done
 
   if [[ -z "$breakpoint_index" ]]; then
-    echo "Индекс $breakpoint_index точки остановы не найден"
     list_bp
   elif [[ $(echo $breakpoint_index | grep '^[0-9]*') ]]; then
     if [[ -n ${lines[$breakpoint_index]} ]]; then
@@ -70,6 +69,30 @@ function set_breakpoint() {
     fi
   else
     echo "Индекс $breakpoint_index точки остановы не является числовым"
+  fi
+}
+
+function clear_bp() {
+  local line_number=$1
+
+  if [[ -z "$line_number" ]]; then
+    breakpoints=()
+    echo "Все точки остановы удалены"
+  elif [[ $(echo $line_number | grep '^[0-9]*') ]]; then
+    if has_breakpoint $line_number; then
+      length=${#breakpoints[@]}
+
+      for (( i=0; i<length; i++ )); do
+        if [[ $line_number -eq ${breakpoints[$i]} ]]; then
+          unset 'breakpoints[$i]'
+          echo "Точка остановы на строке $line_number удалена"
+        fi
+      done
+    else
+      echo "На строке $line_number не найдена точка остановы"
+    fi
+  else
+    echo "Переданный аргумент не является числовым"
   fi
 }
 
@@ -136,6 +159,9 @@ function step_in() {
         ;;
       bp)
         set_breakpoint $args
+        ;;
+      cb)
+        clear_bp $args
         ;;
       bc)
         set_breakpoint_cond $args
