@@ -28,5 +28,5 @@ driver -> debug + original script <- read cmd
 
 ## Пример использования
 
-`chmod +x ./install && ./install`
+`chmod +x ./install && ./install` <br />
 `debug sort`
