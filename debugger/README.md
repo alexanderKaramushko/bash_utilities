@@ -29,4 +29,4 @@ driver -> debug + original script <- read cmd
 ## Пример использования
 
 `chmod +x ./install && ./install` <br />
-`debug sort`
+`debug cp prog.c prog.bak`
