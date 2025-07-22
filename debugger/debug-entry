@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 # NAME
-#   debug - установка входной точки для дебаггинга
+#   debug-entry - установка входной точки для дебаггинга
 
 # SYNOPSIS 
-#   debug [script tmp lib ...]
+#   debug-entry [script tmp lib ...]
 
 # DESCRIPTION 
-#   debug — это утилита командной строки, предназначенная для упрощения процесса отладки других скриптов.
+#   debug-entry — это утилита командной строки, предназначенная для упрощения процесса отладки других скриптов.
 #   Позволяет:
 #   – указывать места в программе, в которых необходимо остановить выполнение (точки останова).
 #   – Выполнять заданное количество операторов в программе (пошаговое выполнение).
@@ -51,7 +51,7 @@ done < $original_script
 
 trap 'cleanup "$tmp_dir/$debugger_name"' EXIT
 
-let debug_lines_count=$(wc -l "$lib_dir/debug" | grep -Eo '[0-9]+')
+let debug_lines_count=$(wc -l "$lib_dir/debug-entry" | grep -Eo '[0-9]+')
 
 set -o functrace
 

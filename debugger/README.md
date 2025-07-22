@@ -28,4 +28,5 @@ driver -> debug + original script <- read cmd
 
 ## Пример использования
 
-`./debug-driver sort`
+`chmod +x ./install && ./install`
+`debug sort`

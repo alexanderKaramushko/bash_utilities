@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+function make_executable {
+  for file in $(ls $PWD); do
+    if [ -f $file ]; then
+      if [[ "$(head -n 1 $file)" = '#!/usr/bin/env bash' ]]; then
+        if [[ $file = 'debug-driver' ]]; then
+          if [[ -e ~/.bashrc ]]; then
+            echo "alias debug='debug-driver'" >> ~/.bashrc
+            source ~/.bashrc
+          fi
+
+          if [[ -e ~/.zshrc ]]; then
+            echo "alias debug='debug-driver'" >> ~/.zshrc
+            source ~/.zshrc
+          fi
+
+          if [[ -e ~/.bash_profile ]]; then
+            echo "alias debug='debug-driver'" >> ~/.bash_profile
+            source ~/.bash_profile
+          fi
+        fi
+
+        cp $file /usr/local/bin
+        chmod +x /usr/local/bin/$file
+      fi
+    fi
+  done
+}
+
+make_executable

@@ -60,13 +60,13 @@ shift
 tmp='/tmp'
 
 # Директория скрипта
-lib='.'
+lib='/usr/local/bin'
 
 # tmp-файл дебаггера с PID процесса
-debug_file="$tmp/debug$$"
+debug_file="$tmp/debug-entry$$"
 
 # tmp-скрипт дебаггера с оригинальным скриптом
-cat "$lib/debug" "$script_path" > $debug_file
+cat "$lib/debug-entry" "$script_path" > $debug_file
 
 # Запускаем в bash-оболочке скрипт дебаггера и оригинальный скрипт
 # "Убиваем" текущий процесс
