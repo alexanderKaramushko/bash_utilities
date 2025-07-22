@@ -36,6 +36,18 @@ lib_dir=$3
 # Удаляем аргументы дебаггера
 shift 3
 
+while getopts ":e" opt; do
+  case $opt in
+    e)
+      break_on_stderr=1
+      ;;
+    \?)
+      echo 'usage: debug-entry [-e]'
+      exit 1
+      ;;
+  esac
+done
+
 # Импортируем функции дебаггига
 source "$lib_dir/debug-fns"
 
@@ -56,4 +68,4 @@ let debug_lines_count=$(wc -l "$lib_dir/debug-entry" | grep -Eo '[0-9]+')
 set -o functrace
 
 # Точка входа в режим дебаггинга
-trap 'enter_debug $(( $LINENO-1-$debug_lines_count ))' DEBUG
+trap 'enter_debug $(( $LINENO-1-$debug_lines_count )) $(maybe_read_stderr $?)' DEBUG
