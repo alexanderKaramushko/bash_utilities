@@ -50,12 +50,19 @@ function set_breakpoint() {
     list_bp
   elif [[ $(echo $breakpoint_index | grep '^[0-9]*') ]]; then
     if [[ -n ${lines[$breakpoint_index]} ]]; then
-      breakpoints=$(cat <(
+      sorted=$(cat <(
+        echo $breakpoint_index
+
         for breakpoint in "$breakpoints"; do
-          echo $breakpoint_index
           echo $breakpoint
         done
       ) | sort -n)
+
+      breakpoints=()
+
+      for item in $sorted; do
+        breakpoints+=($item)
+      done
 
       echo "Установлена точка остановы на строке $breakpoint_index"
     else
@@ -78,34 +85,40 @@ function set_breakpoint_cond() {
 }
 
 function has_breakpoint() {
-  breakpoint_index=$1
+  local line_number=$1
 
   local i=0
 
   if [ "$breakpoints" ]; then
     while [[ $i -lt ${#breakpoints[@]} ]]; do
-      if [[ ${breakpoints[$i] -eq $current_line_number} ]]; then
+      if [ ${breakpoints[$i]} -eq $line_number ]; then
         return 0
       fi
-      ((i+1))
+
+      let i=$i+1
     done
   fi
 
   return 1
 }
 
-function display_text() {
+function display_script() {
   local line_number=0
 
   if [[ ${#lines[@]} -gt 0 ]]; then
     for line in "${lines[@]}"; do
-      pointer=''
+      pointer=' '
+      bp='  '
 
       if [[ $current_line_number -eq $line_number ]]; then
         pointer='>'
       fi
 
-      echo "$line_number:$pointer $line"
+      if has_breakpoint $line_number; then
+        bp='bp'
+      fi
+
+      echo "$line_number:$pointer$bp $line"
       let line_number=$line_number+1
     done
   else
@@ -141,7 +154,7 @@ function step_in() {
         trace=0
         ;;
       dt)
-        display_text
+        display_script
         ;;
     esac
   done
@@ -158,7 +171,7 @@ function enter_debug() {
     echo "$PS4 line $current_line_number: ${lines[$current_line_number]}"
   fi
 
-  if has_breakpoint; then
+  if has_breakpoint $current_line_number; then
     echo "Найдена точка остановы на строке $current_line_number"
     step_in
   elif [[ -n $breakpoint_cond ]]; then
