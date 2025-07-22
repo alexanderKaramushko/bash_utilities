@@ -223,9 +223,8 @@ function enter_debug() {
   if has_breakpoint $current_line_number; then
     echo "Найдена точка остановы на строке $current_line_number"
     step_in
-  elif [[ -n $breakpoint_cond ]]; then
-    eval "$breakpoint_cond"
-    echo "Выполнено условие: $breakpoint_cond"
+  elif [[ -n $breakpoint_cond ]] && eval "$breakpoint_cond"; then
+    echo "Выполнено условие: '$breakpoint_cond'"
     step_in
   elif [[ $skip -eq 0 ]]; then
     step_in
