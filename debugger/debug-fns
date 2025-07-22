@@ -25,6 +25,14 @@ function cleanup() {
   rm $1
 }
 
+function maybe_read_stderr() {
+  if [[ $break_on_stderr -eq 1 ]]; then
+    echo $1
+  fi
+
+  echo 0
+}
+
 function list_bp() {
   for breakpoint in ${breakpoints[@]}; do
     if [[ -n ${lines[$breakpoint]} ]]; then
@@ -217,6 +225,9 @@ function step_in() {
 
 function enter_debug() {
   current_line_number=$1
+  cmd_status=$2
+
+  echo $cmd_status
 
   if [[ $skip -gt 0 ]]; then
     let skip=$skip-1
@@ -231,6 +242,9 @@ function enter_debug() {
     step_in
   elif [[ -n $breakpoint_cond ]] && eval "$breakpoint_cond"; then
     echo "Выполнено условие: '$breakpoint_cond'"
+    step_in
+  elif [[ $cmd_status -eq 1 ]]; then
+    echo "STDERR на строке $current_line_number"
     step_in
   elif [[ $skip -eq 0 ]]; then
     step_in
