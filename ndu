@@ -1,15 +1,19 @@
 #!/usr/bin/env bash
 
-str=$(cat <(
-  echo 3
-  echo 1
-  echo 2
-) | sort -n)
+for dirOrFile in $*; do
+  if [ -e "$dirOrFile" ]; then
+    size=$(du -s $dirOrFile | cut -f 1)
+    # Под один блок в UNIX-системе выделяется минимум 1024 байта
+    let totalBytes=$size*1024
 
-breakpoints=()
+    echo "Выделено под блок $dirOrFile: $totalBytes"
 
-for item in $str; do
-  breakpoints+=($item)
+    if [ $totalBytes -ge 1048576 ]; then
+      echo "$(( $totalBytes / 1048576 )) Мб"
+    fi
+
+     if [ $totalBytes -ge 1024 ]; then
+      echo "$(( $totalBytes / 1024 )) Кб"
+    fi
+  fi
 done
-
-echo ${breakpoints[@]}
